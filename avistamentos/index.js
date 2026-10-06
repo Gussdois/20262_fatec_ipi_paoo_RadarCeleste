@@ -1,34 +1,35 @@
-const express = require('express');
-const axios = require('axios');
-const app = express();
+const axios = require('axios')
+const express = require('express')
+const app = express()
+app.use(express.json())
+let contador = 0
+const avistamentos ={}
+app.get('/avistamentos', (req, res) =>{
+    res.json(avistamentos)
+})
+app.put('/avistamentos', async (req,res) =>{
+  const { local, descricao } = req.body
+  if (local === undefined || local === '' || descricao === undefined || descricao === '') {
+    return res.status(400).json({erro:'local e descricao são obrigatórios'})
+  }
+  contador++
+  const avistamento = {
+    id: contador,
+    local: local,
+    descricao: descricao
+  }
+  avistamentos[contador] = avistamento
+  await axios.post('http://localhost:10000/eventos',{
+    tipo: 'AvistamentoCriado',
+    dados: avistamento
+  })
+  res.status(201).json(avistamento)
+})
 
-app.use(express.json());
-const avistamentos = {};
-let contador = 0;
-app.get('/avistamentos', (req,res)=>{
-    res.send(avistamentos);
-});
-app.put('/avistamentos', async(req, res)=>{
-    const{local, descricao} = req.body;
-    if (!local || !descricao){
-        return res.status(400).send({erro: "local e descricao sao obrigatorios"});
-    }
-    contador++;
-    avistamentos[contador] = {
-        id:contador,
-        local,
-        descricao
-    };
-    await axios.post('http://localhost:10000/eventos',{
-        tipo: 'AvistamentoCriado',
-        dados: avistamentos[contador]
-        });
-    res.status(201).send(avistamentos[contador]);
-});
- app.post('/eventos',(req,res)=>{
-    console.log('Evento recebido no microsserviço de Avistamentos:',req.body.tipo);
-    res.status(200).send({ msg: 'ok'});
-});
-app.listen(4000, ()=>{
-    console.log("Avistamentos. Porta 4000");
-});
+app.post('/eventos', (req, res) =>{
+  console.log(req.body.tipo)
+  res.status(200).json({ msg:'ok'})
+})
+
+const port = 4000
+app.listen(port,()=>console.log(`Avistamentos. Porta ${port}`))
