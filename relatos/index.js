@@ -27,10 +27,18 @@ app.put('/avistamentos/:id/relatos', async(req,res) =>{
     const novoRelato = {id: idRelato, texto};
     relatosDoAvistamento.push(novoRelato);
     relatosPorAvistamentoId[req.params.id] = relatosDoAvistamento;
+    await axios.post('http://localhost:10000/eventos',{
+        tipo: 'RelatoCriado',
+        dados:{
+            id: idRelato,
+            texto: texto,
+            idAvistamento: req.params.id
+        }
+    });
     res.status(201).send(novoRelato);
 });
 app.post('/eventos',(req,res)=> {
-    console.log('Evento recebido no microsserviço de Avistamentos:',req.body.tipo);
+    console.log('Evento recebido no microsserviço de Relatos:',req.body.tipo);
     res.status(200).send({ msg: 'ok'});
 });
 app.listen(4100,()=>{

@@ -1,4 +1,5 @@
 const express = require('express');
+const axios = require('axios');
 const app = express();
 
 app.use(express.json());
@@ -7,7 +8,7 @@ let contador = 0;
 app.get('/avistamentos', (req,res)=>{
     res.send(avistamentos);
 });
-app.put('/avistamentos', (req, res)=>{
+app.put('/avistamentos', async(req, res)=>{
     const{local, descricao} = req.body;
     if (!local || !descricao){
         return res.status(400).send({erro: "local e descricao sao obrigatorios"});
@@ -18,6 +19,10 @@ app.put('/avistamentos', (req, res)=>{
         local,
         descricao
     };
+    await axios.post('http://localhost:10000/eventos',{
+        tipo: 'AvistamentoCriado',
+        dados: avistamentos[contador]
+        });
     res.status(201).send(avistamentos[contador]);
 });
  app.post('/eventos',(req,res)=>{
