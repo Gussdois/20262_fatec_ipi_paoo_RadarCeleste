@@ -29,7 +29,10 @@ app.put('/avistamentos/:id/relatos', async(req,res) =>{
     relatosPorAvistamentoId[req.params.id] = relatosDoAvistamento;
     res.status(201).send(novoRelato);
 });
-
-app.listen(4001,()=>{
-    console.log('relatos. Porta 4001');
+app.post('/eventos',(req,res)=> {
+    console.log('Evento recebido no microsserviço de Avistamentos:',req.body.tipo);
+    res.status(200).send({ msg: 'ok'});
+});
+app.listen(4100,()=>{
+    console.log('relatos. Porta 4100');
 });
